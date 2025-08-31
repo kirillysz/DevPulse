@@ -3,7 +3,7 @@ from __future__ import annotations
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Boolean, Integer, String, Text, ForeignKey
 
-from database.base import Base
+from core.database import Base
 
 class Task(Base):
     __tablename__ = "tasks"

@@ -3,7 +3,7 @@ from __future__ import annotations
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String
 
-from database.base import Base
+from core.database import Base
 
 class User(Base):
     __tablename__ = "users"

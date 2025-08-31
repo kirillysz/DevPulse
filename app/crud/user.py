@@ -4,10 +4,10 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app.models.user import User
-from app.schemas.user import UserRead, UserCreate
+from models.user import User
+from schemas.user import UserRead, UserCreate
 
-from app.core.security import hash_password
+from core.security import hash_password
 
 class UserCRUD:
     @staticmethod
