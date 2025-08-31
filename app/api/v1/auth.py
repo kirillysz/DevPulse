@@ -15,12 +15,12 @@ user_crud = UserCRUD()
 async def get_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: AsyncSession = Depends(get_db)
-):
-    user = await user_crud.get_user_by_email(db=db, email=form_data.username)
+) -> Token:
+    user = await user_crud.get_user_for_auth(db=db, email=form_data.username)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect email or password")
     
-    if not verify_password(form_data.password, user.password_hash):
+    if not verify_password(form_data.password, user.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect email or password")
     
     access_token = create_access_token(data={"sub": str(user.id)})

@@ -3,6 +3,7 @@ from fastapi import HTTPException, status
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
 
 from models.user import User
 from schemas.user import UserRead, UserCreate
@@ -11,8 +12,8 @@ from core.security import hash_password
 
 class UserCRUD:
     @staticmethod
-    async def _get_user_by_field(db: AsyncSession, field: str, value) -> UserRead:
-        query = select(User).where(getattr(User, field) == value)
+    async def _get_user_by_field(db: AsyncSession, field: str, value) -> UserRead | bool:
+        query = select(User).options(selectinload(User.tasks)).where(getattr(User, field) == value)
 
         result = await db.execute(query)
         user = result.scalars().first()
@@ -20,7 +21,19 @@ class UserCRUD:
         if user:
             return UserRead.model_validate(user)
         
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        return False
+
+    @staticmethod
+    async def get_user_for_auth(db: AsyncSession, email: str) -> User | None:
+        query = select(User).where(User.email == email)
+        result = await db.execute(query)
+
+        user = result.scalar_one_or_none()
+
+        if user:
+            return user
+        
+        return None
 
     @staticmethod
     async def get_user_by_id(db: AsyncSession, id: int) -> UserRead:
@@ -42,6 +55,6 @@ class UserCRUD:
         db.add(new_user)
 
         await db.commit()
-        await db.refresh(new_user)
+        await db.refresh(new_user, ["tasks"])
         
         return UserRead.model_validate(new_user)

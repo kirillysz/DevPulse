@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict, Field
-from typing import List
+from typing import List, Optional
 from schemas.task import TaskRead
 
 class UserBase(BaseModel):
@@ -7,7 +7,7 @@ class UserBase(BaseModel):
     email: str
 
 class UserRead(UserBase):
-    tasks: List[TaskRead] = []
+    tasks: Optional[List[TaskRead]] = None
 
     model_config = ConfigDict(from_attributes=True)
 
